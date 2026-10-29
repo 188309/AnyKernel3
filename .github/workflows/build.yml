@@ -1641,7 +1641,16 @@ jobs:
               fi
             fi
           fi
-          
+      - name: 修复 SukiSU fallthrough 编译错误
+        if: inputs.ksu_variant == 'SukiSU'
+        run: |
+          f="$KERNEL_ROOT/KernelSU/kernel/policy/allowlist.c"
+          test -f "$f"
+          if grep -qF '/* fall through */' "$f"; then
+            sed -i 's@/\* fall through \*/@fallthrough;@' "$f"
+          fi
+          grep -qF 'fallthrough;' "$f"
+     
       - name: 编译内核
         id: compile_kernel
         uses: nick-fields/retry@v4
